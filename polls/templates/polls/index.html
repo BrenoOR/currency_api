@@ -1,0 +1,15 @@
+{% if latest_rates %}
+    <ul>
+        {% for rate in latest_rates %}
+        <li>
+            <a href="{% url 'polls:latest_rate' rate.base_currency rate.target_currency%}">
+                {{ rate.base_currency }} -> {{ rate.target_currency }}
+            </a>
+        </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>
+        No exchanges checked yet.
+    </p>
+{% endif %}

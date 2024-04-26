@@ -1,2 +1,6 @@
 # IDE Config
 /.idea
+
+*.pyc
+
+*.sqlite3

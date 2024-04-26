@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>History: {{ rates.0.base_currency }} -> {{ rates.0.target_currency }}</title>
+</head>
+<body>
+<div>
+    <ul>
+        {% for rate in rates %}
+        <li>
+            <p>
+                {{ rate.timestamp }}: {{ rate.rate|floatformat:2 }}
+            </p>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+<div>
+    <a href="{% url 'polls:index'%}">Home</a>
+    <a href="{% url 'polls:latest_rate' rates.0.base_currency rates.0.target_currency%}">Check
+        history</a>
+</div>
+</body>
+</html>

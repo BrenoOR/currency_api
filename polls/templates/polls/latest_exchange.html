@@ -1,3 +1,18 @@
-<p>
-    {{ base_currency }}$ 1.00 -> {{ target_currency }}$ {{ rate|floatformat:2 }}; Last update: {{ timestamp }}
-</p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ latest_rate.base_currency }} -> {{ latest_rate.target_currency }}</title>
+</head>
+<body>
+<div>
+    {{ latest_rate.base_currency }}$ 1.00 -> {{ latest_rate.target_currency }}$ {{ latest_rate.rate|floatformat:2 }};
+    Last update: {{ latest_rate.timestamp }}
+</div>
+<div>
+    <a href="{% url 'polls:index'%}">Home</a>
+    <a href="{% url 'polls:historical_data' latest_rate.base_currency latest_rate.target_currency%}">Check
+        history</a>
+</div>
+</body>
+</html>

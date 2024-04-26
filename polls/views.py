@@ -1,43 +1,54 @@
+from django.db.models import F
 from django.shortcuts import render
-from django.http import HttpResponse, Http404
-from django.utils import timezone, timesince
+from django.http import HttpResponseRedirect, Http404
+from django.urls import reverse
+from django.views import generic
 from .models import Rate
 
 
-def index(request):
-    latest_rates = Rate.objects.order_by('-timestamp')
-    exchanges = {}
-    for rate in latest_rates:
-        key = f'{rate.base_currency}->{rate.target_currency}'
-        if key not in exchanges:
-            exchanges[key] = rate.id
-        else:
-            latest_rates = latest_rates.exclude(id=rate.id)
+class IndexView(generic.ListView):
+    template_name = 'polls/index.html'
+    context_object_name = 'latest_rates'
 
-    context = {
-        'latest_rates': latest_rates
-    }
-    return render(request, 'polls/index.html', context)
+    def get_queryset(self):
+        latest_rates = Rate.objects.order_by('-timestamp')
+        exchanges = {}
+        for rate in latest_rates:
+            key = f'{rate.base_currency}->{rate.target_currency}'
+            if key not in exchanges:
+                exchanges[key] = rate.id
+            else:
+                latest_rates = latest_rates.exclude(id=rate.id)
+        return latest_rates
 
 
-def latest_rate(request, base_currency, target_currency):
-    try:
-        rates = Rate.objects.filter(base_currency=base_currency, target_currency=target_currency)
+class LatestRateView(generic.ListView):
+    model = Rate
+    template_name = 'polls/latest_exchange.html'
+    context_object_name = 'latest_rate'
+
+    def get_queryset(self):
+        rates = Rate.objects.filter(base_currency=self.kwargs['base_currency'],
+                                    target_currency=self.kwargs['target_currency'])
         if len(rates) < 1:
             raise Rate.DoesNotExist
-        latest = rates[0].rate
         timestamp = rates[0].timestamp
+        latest_rate = rates[0]
         for rate in rates:
             if rate.timestamp > timestamp:
-                latest = rate.rate
+                latest_rate = rate
                 timestamp = rate.timestamp
+        return latest_rate
 
-        context = {
-            'base_currency': base_currency,
-            'target_currency': target_currency,
-            'rate': latest,
-            'timestamp': timestamp,
-        }
-    except Rate.DoesNotExist:
-        raise Http404(f'No exchange checked from {base_currency} to {target_currency}')
-    return render(request, 'polls/latest_exchange.html', context)
+
+class HistoricalDataView(generic.ListView):
+    template_name = 'polls/historical_data.html'
+    context_object_name = 'rates'
+
+    def get_queryset(self):
+        rates = Rate.objects.filter(base_currency=self.kwargs['base_currency'],
+                                    target_currency=self.kwargs['target_currency'])
+        if len(rates) < 1:
+            raise Rate.DoesNotExist
+
+        return rates.order_by('-timestamp')

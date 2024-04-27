@@ -1,13 +1,12 @@
 from django.db.models import F
 from django.shortcuts import render
 from django.http import HttpResponseRedirect, Http404
-from django.urls import reverse
 from django.views import generic
 from .models import Rate
 
 
 class IndexView(generic.ListView):
-    template_name = 'polls/index.html'
+    template_name = 'exchange_rates/index.html'
     context_object_name = 'latest_rates'
 
     def get_queryset(self):
@@ -24,7 +23,7 @@ class IndexView(generic.ListView):
 
 class LatestRateView(generic.ListView):
     model = Rate
-    template_name = 'polls/latest_exchange.html'
+    template_name = 'exchange_rates/latest_exchange.html'
     context_object_name = 'latest_rate'
 
     def get_queryset(self):
@@ -42,7 +41,7 @@ class LatestRateView(generic.ListView):
 
 
 class HistoricalDataView(generic.ListView):
-    template_name = 'polls/historical_data.html'
+    template_name = 'exchange_rates/historical_data.html'
     context_object_name = 'rates'
 
     def get_queryset(self):

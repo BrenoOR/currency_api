@@ -10,8 +10,8 @@
     Last update: {{ latest_rate.timestamp }}
 </div>
 <div>
-    <a href="{% url 'polls:index'%}">Home</a>
-    <a href="{% url 'polls:historical_data' latest_rate.base_currency latest_rate.target_currency%}">Check
+    <a href="{% url 'exchange_rates:index'%}">Home</a>
+    <a href="{% url 'exchange_rates:historical_data' latest_rate.base_currency latest_rate.target_currency%}">Check
         history</a>
 </div>
 </body>

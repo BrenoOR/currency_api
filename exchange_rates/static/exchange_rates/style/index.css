@@ -3,6 +3,7 @@ body {
   overflow: hidden;
   margin: auto
 }
+
 .DesktopHome {
   width: 200vmin;
   height: 100vmin;
@@ -73,6 +74,132 @@ body {
   font-weight: 900;
   text-transform: uppercase;
   text-decoration: none;
-  letter-spacing: 1.44px;
+  letter-spacing: 1.25px;
+  word-wrap: break-word
+}
+
+.LatestExchangeFrame{
+  width: 50%;
+  height: 60%;
+  padding-left: 0%;
+  padding-right: 0%;
+  padding-top: 15%;
+  padding-bottom: 15%;
+  left: 0px;
+  top: 0px;
+  position: absolute;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  align-content: space-around;
+  flex-wrap: nowrap;
+  flex-direction: column
+}
+
+.LatestExchangeTable{
+  width: 70%;
+  height: 60%;
+  position: relative;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  align-content: space-around;
+  flex-wrap: wrap;
+  flex-direction: row
+}
+
+.LatestExchangeDiv{
+  height: 50%;
+  width: 50%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  align-content: space-around;
+  align-items: center;
+  flex-direction: row
+}
+
+.MenuDiv{
+  height: 50%;
+  width: 50%;
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  align-content: space-around;
+  align-items: center;
+  flex-direction: row
+}
+
+.CurrencyDiv{
+  width: 70%;
+  height: 20%;
+  left: 0px;
+  top: 0px;
+  position: relative;
+  background: rgba(245, 247, 255, 0.70);
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  border: 2px black solid;
+  border-radius: 6px;
+  color: black;
+  font-size: 20px;
+  font-family: Roboto;
+  font-weight: 400;
+  word-wrap: break-word;
+  display: flex;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+  text-transform: uppercase;
+  text-decoration: none;
+  letter-spacing: 1.05px;
+  word-wrap: break-word
+}
+
+
+.MenuButton{
+  width: 40%;
+  height: 20%;
+  left: 0px;
+  top: 0px;
+  position: relative;
+  background: rgba(245, 247, 255, 0.70);
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  border: 2px black solid;
+  border-radius: 6px;
+  color: black;
+  font-size: 15px;
+  font-family: Roboto;
+  font-weight: 400;
+  word-wrap: break-word;
+  display: flex;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+  text-transform: uppercase;
+  text-decoration: none;
+  letter-spacing: 1.05px;
+  word-wrap: break-word
+}
+
+.LatestExchangeUpdate{
+  width: 70%;
+  height: 15%;
+  left: 0px;
+  top: 0px;
+  position: relative;
+  background: rgba(245, 247, 255, 0.60);
+  border-radius: 6px;
+  color: black;
+  font-size: 15px;
+  font-family: Roboto;
+  font-weight: 400;
+  word-wrap: break-word;
+  display: flex;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+  text-transform: uppercase;
+  text-decoration: none;
+  letter-spacing: 1.05px;
   word-wrap: break-word
 }

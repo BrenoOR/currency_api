@@ -11,18 +11,18 @@
 <div class="DesktopHome">
   <div class="MainFrame">
     <img class="BackgroundImage" src="{% static 'exchange_rates/resources/background_image.jpg' %}" />
-    <div class="CurrencyExchangeChecker">Currency Exchange Checker</div>
+    <div class="CurrencyExchangeChecker">Currency Exchange Checkers</div>
     <div class="ExchangesListFrame">
         {% if latest_rates %}
         {% for rate in latest_rates %}
-        <a class="ExchangeButton" href="{% url 'exchange_rates:latest_rate' rate.base_currency rate.target_currency%}">
-            {{ rate.base_currency }} -> {{ rate.target_currency }}
+        <a class="ExchangeButton" href="{% url 'exchange_rates:exchange_rate' rate.base_currency rate.target_currency 1%}">
+            {{ rate.base_currency }} => {{ rate.target_currency }}
         </a>
         {% endfor %}
         {% else %}
-        <p>
+        <div class="LatestExchangeUpdate">
             No exchanges checked yet.
-        </p>
+        </div>
         {% endif %}
     </div>
   </div>

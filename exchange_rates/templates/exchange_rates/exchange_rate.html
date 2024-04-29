@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <link href="https://fonts.googleapis.com/css?family=Montaga&display=swap" rel="stylesheet"/>
     <link href="{% static 'exchange_rates/style/index.css' %}" rel="stylesheet"/>
-    <title>History: {{ rates.0.base_currency }} -> {{ rates.0.target_currency }}</title>
+    <title>{{ info.latest_rate.base_currency }} -> {{ info.latest_rate.target_currency }}</title>
 </head>
 <body>
 <div class="DesktopHome">
@@ -27,35 +27,47 @@
             {% endif %}
         </div>
         <div class="LatestExchangeFrame">
+            {% if info.latest_rates %}
             <div class="LatestExchangeTable">
                 <div class="LatestExchangeDiv">
-                    <form class="CurrencyDivHist"
-                          action="{% url 'exchange_rates:change_range' info.base info.target %}"
+                    <label class="CurrencyDiv">
+                        {{ info.latest_rate.base_currency }}
+                    </label>
+                    <form class="CurrencyDiv"
+                          action="{% url 'exchange_rates:calc_exchange' info.latest_rate.base_currency info.latest_rate.target_currency info.value %}"
                           method="post">
                         {% csrf_token %}
-                        <input type="date" id="start" name="start">
-                        <input type="date" id="end" name="end">
-                        <input type="submit" value="Set period">
+                        <input type="text" name="{{ info.latest_rate.base_currency }}"
+                               value="${{ info.value|floatformat:2 }}">
                     </form>
-                    <ul>
-                        {% for rate in info.history %}
-                        <li>
-                            <p>
-                                {{ rate.timestamp }}: {{ rate.rate|floatformat:2 }}
-                            </p>
-                        </li>
-                        {% endfor %}
-                    </ul>
+                </div>
+                <div class="LatestExchangeDiv">
+                    <label class="CurrencyDiv">
+                        {{ info.latest_rate.target_currency }}
+                    </label>
+                    <div class="CurrencyDiv">
+                        $ {{ info.result|floatformat:2 }}
+                    </div>
                 </div>
             </div>
+            {% else %}
+            <div class="LatestExchangeUpdate">
+                No exchanges checked yet.
+            </div>
+            {% endif %}
             <div class="MenuDiv">
                 <a class="MenuButton" href="{% url 'exchange_rates:index'%}">Home</a>
                 {% if info.latest_rates %}
                 <a class="MenuButton"
-                   href="{% url 'exchange_rates:exchange_rate' info.base info.target 1.0%}">Check
-                    latest</a>
+                   href="{% url 'exchange_rates:historical_data' info.latest_rate.base_currency info.latest_rate.target_currency 0 0%}">Check
+                    history</a>
                 {% endif %}
             </div>
+            {% if info.latest_rates %}
+            <div class="LatestExchangeUpdate">
+                Última atualização: {{ info.latest_rate.timestamp }}
+            </div>
+            {% endif %}
         </div>
     </div>
 </div>

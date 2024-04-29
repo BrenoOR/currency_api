@@ -3,6 +3,10 @@
 
 *.pyc
 
+# Database
 *.sqlite3
 *.postgres
 /exchange_rates/migrations/
+
+# Tests
+.coverage

@@ -1,0 +1,19 @@
+version: '3'
+
+services:
+  currency_api:
+    image: currency_api
+    entrypoint: ./entrypoint.sh
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql+psycopg://postgres:admin@0.0.0.0:5432/exchange_rates
+      DJANGO_SUPERUSER_USERNAME: admin
+      DJANGO_SUPERUSER_PASSWORD: admin
+      DJANGO_SUPERUSER_EMAIL: admin@admin.com
+
+volumes:
+  pgdata:

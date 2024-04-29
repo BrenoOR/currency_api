@@ -1,5 +1,4 @@
-from django.core import serializers
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, Http404
 from django.utils import timezone
 from django.urls import reverse
 from django.views import generic
@@ -77,12 +76,15 @@ class LatestRateView(generic.ListView):
     context_object_name = 'rate'
 
     def get_queryset(self):
-        rates = Rate.objects.filter(
-            base_currency=self.kwargs['base_currency'],
-            target_currency=self.kwargs['target_currency'],
-        )
-        if len(rates) < 1:
-            raise Rate.DoesNotExist
+        try:
+            rates = Rate.objects.filter(
+                base_currency=self.kwargs['base_currency'],
+                target_currency=self.kwargs['target_currency'],
+            )
+            if len(rates) < 1:
+                raise Rate.DoesNotExist
+        except Rate.DoesNotExist:
+            raise Http404
         timestamp = rates[0].timestamp
         latest_rate = rates[0]
         for rate in rates:

@@ -1,10 +1,12 @@
 import datetime
+import time
 
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 
-from .models import Rate
+from .models import Rate, Checker
+from .currency_checker import checker
 
 
 class TestSetup:
@@ -30,6 +32,22 @@ class TestSetup:
             target_currency=target_currency,
             rate=rate,
             timestamp=time,
+        )
+
+    def create_checker(self, base_currency, target_currency):
+        """
+        Auxiliary method that generates Checker objects.
+
+        ...
+        Attributes
+        ------------
+        base_currency : The base currency of the exchange.
+        target_currency : The target currency of the exchange.
+        """
+        return Checker.objects.create(
+            base_currency=base_currency,
+            target_currency=target_currency,
+            check_period=datetime.timedelta(seconds=1800),
         )
 
     def get_test_setup(self):
@@ -119,6 +137,30 @@ class ExchangeRateViewTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['info']['result'], 1.5 * test_setup[0][2].rate)
 
+    def test_form_exchange_should_post_correct_value(self):
+        """
+        Post the updated value and retrieve the form updated value input * latest exchange rate.
+        """
+        test_setup = TestSetup().get_test_setup()
+        response = self.client.post(path=reverse('exchange_rates:calc_exchange',
+                                                 kwargs={
+                                                     'base_currency': 'BRL',
+                                                     'target_currency': 'USD',
+                                                     'value': '1.5'
+                                                 }),
+                                    data={'BRL': '$1.7'})
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(len(response.url.split('/')), 4)
+        none, base_currency, target_currency, value = response.url.split('/')
+        redirect = self.client.get(reverse('exchange_rates:exchange_rate',
+                                           kwargs={
+                                               'base_currency': base_currency,
+                                               'target_currency': target_currency,
+                                               'value': value
+                                           }))
+        self.assertEqual(redirect.status_code, 200)
+        self.assertEqual(redirect.context['info']['result'], 1.7 * test_setup[0][2].rate)
+
 
 class LatestRateViewTests(TestCase):
     def test_request_should_respond_json(self):
@@ -138,6 +180,15 @@ class LatestRateViewTests(TestCase):
                 'timestamp': test_setup[0][2].timestamp
             }
         )
+
+    def test_no_rates_should_return_404(self):
+        """
+        Return a 404 error
+        """
+        test_setup = TestSetup().get_test_setup()
+        response = self.client.get(reverse('exchange_rates:latest_rate',
+                                           kwargs={'base_currency': 'EUR', 'target_currency': 'USD'}))
+        self.assertEqual(response.status_code, 404)
 
 
 class HistoricalDataViewTests(TestCase):
@@ -212,6 +263,64 @@ class HistoricalDataViewTests(TestCase):
                                            }))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.context['info']['history']), 2)
+
+    def test_form_time_diff_should_post_correct_time_diff(self):
+        """
+        Post updated time interval and retrieve all rates inside it.
+        In this test, we insert 3 rates and should retrieve 2 rates only.
+        """
+        TestSetup().get_test_setup()
+        start_date = timezone.now() - datetime.timedelta(days=15)
+        end_date = timezone.now()
+        response = self.client.post(path=reverse('exchange_rates:change_range',
+                                                 kwargs={
+                                                     'base_currency': 'BRL',
+                                                     'target_currency': 'USD'
+                                                 }),
+                                    data={
+                                        'start': start_date.strftime('%Y-%m-%d'),
+                                        'end': end_date.strftime('%Y-%m-%d')
+                                    })
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(len(response.url.split('/')), 6)
+        none, base_currency, target_currency, url_str, start_date_redi, end_date_redi = response.url.split('/')
+        redirect = self.client.get(reverse('exchange_rates:historical_data',
+                                           kwargs={
+                                               'base_currency': base_currency,
+                                               'target_currency': target_currency,
+                                               'start_date': start_date_redi,
+                                               'end_date': end_date_redi
+                                           }))
+        self.assertEqual(redirect.status_code, 200)
+        self.assertEqual(len(redirect.context['info']['history']), 2)
+
+    def test_form_time_diff_no_info_should_post_correct_full_time_interval(self):
+        """
+        Post no time interval and retrieve all rates.
+        In this test, we insert 3 rates and should retrieve 3 rates.
+        """
+        TestSetup().get_test_setup()
+        response = self.client.post(path=reverse('exchange_rates:change_range',
+                                                 kwargs={
+                                                     'base_currency': 'BRL',
+                                                     'target_currency': 'USD'
+                                                 }),
+                                    data={
+                                        'start': '',
+                                        'end': ''
+                                    })
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(len(response.url.split('/')), 6)
+        none, base_currency, target_currency, url_str, start_date_redi, end_date_redi = response.url.split('/')
+        redirect = self.client.get(reverse('exchange_rates:historical_data',
+                                           kwargs={
+                                               'base_currency': base_currency,
+                                               'target_currency': target_currency,
+                                               'start_date': start_date_redi,
+                                               'end_date': end_date_redi
+                                           }))
+        self.assertEqual(redirect.status_code, 200)
+        self.assertEqual(len(redirect.context['info']['history']), 3)
 
 
 class HistoricalDataJSViewTests(TestCase):
@@ -288,3 +397,29 @@ class HistoricalDataJSViewTests(TestCase):
                 }
             ]
         )
+
+
+class CurrencyCheckerTests(TestCase):
+    def test_exchange_checker_found_should_update_exchange_rate(self):
+        """
+        Verify if a currency exchange (Checker) does not have Rates or its out of date.
+        It should retrieve a new rate.
+        """
+        TestSetup().get_test_setup()
+        checker.update_currency_exchange()
+        TestSetup().create_checker('BRL', 'USD')
+        TestSetup().create_checker('BRL', 'EUR')
+        time.sleep(1)
+        checker.update_currency_exchange()
+        checkers = Checker.objects.all()
+        rates = Rate.objects.all()
+        self.assertEqual(len(checkers), 2)
+        self.assertEqual(len(rates), 7)
+        TestSetup().create_checker('USD', 'EUR')
+        time.sleep(1)
+        checker.update_currency_exchange()
+        checkers = Checker.objects.all()
+        rates = Rate.objects.all()
+        self.assertEqual(len(checkers), 3)
+        self.assertEqual(len(rates), 8)
+

@@ -28,8 +28,23 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    os.getenv('HOST_PRIVATE'),
+    os.getenv('HOST_PUBLIC'),
+    os.getenv('HOST_PUBLIC_DNS'),
+]
 
+#SECURE_PROXY_SSL_HEADER = ("HTTPS_X_FORWARDED_PROTO", "https")
+#SECURE_SSL_HOST = os.getenv('HOST_PRIVATE')
+#SECURE_SSL_REDIRECT = True
+
+#SESSION_COOKIE_SECURE = True
+#CSRF_USE_SESSIONS = True
+#CSRF_COOKIE_SECURE = True
+
+#SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+#SECURE_HSTS_PRELOAD = True
+#SECURE_HSTS_SECONDS = 3600
 
 # Application definition
 
@@ -45,6 +60,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -126,6 +142,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
+STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 STATIC_URL = "static/"
 
 # Default primary key field type

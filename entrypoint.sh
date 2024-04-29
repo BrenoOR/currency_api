@@ -7,4 +7,4 @@ python manage.py migrate
 python manage.py createsuperuser --noinput
 
 # Init app
-python manage.py runserver 0.0.0.0:8000 --noreload
+uvicorn --host <your-machine-private-ip> --use-colors --env-file .env currency_api.asgi:application

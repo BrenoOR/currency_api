@@ -5,6 +5,10 @@ from exchange_rates.models import Rate, Checker
 
 
 def _get_current_currency_exchange(checker, base_currency, target_currency):
+    """
+    The generic currency checker.
+    It checks if the last currency exchange is out of date, based on the Checker model's check period.
+    """
     rates = Rate.objects.filter(base_currency=base_currency,
                                 target_currency=target_currency).order_by('-timestamp')
     if len(rates) > 0:
@@ -36,6 +40,10 @@ def _get_current_currency_exchange(checker, base_currency, target_currency):
 
 
 def update_currency_exchange():
+    """
+    The Scheduled updater.
+    It runs a check for every Checker retrieved on database.
+    """
     checkers = Checker.objects.all()
     for c in checkers:
         _get_current_currency_exchange(checker=c, base_currency=c.base_currency, target_currency=c.target_currency)

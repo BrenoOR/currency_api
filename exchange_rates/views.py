@@ -7,6 +7,9 @@ from .models import Rate
 
 
 class IndexView(generic.ListView):
+    """
+    The Homepage view.
+    """
     template_name = 'exchange_rates/index.html'
     context_object_name = 'latest_rates'
 
@@ -23,6 +26,10 @@ class IndexView(generic.ListView):
 
 
 class ExchangeRateView(generic.ListView):
+    """
+    The Exchange Rates view.
+    Which you can calculate the value of a Currency amount based on the latest rate.
+    """
     model = Rate
     template_name = 'exchange_rates/exchange_rate.html'
     context_object_name = 'info'
@@ -56,6 +63,11 @@ class ExchangeRateView(generic.ListView):
 
 
 def calc_exchange(request, base_currency, target_currency, value):
+    """
+    The Calculate Exchange view.
+    That redirects you to the calculated rate.
+    This view is executed by the Exchange Rates view form.
+    """
     if request.method == 'POST':
         value = float(request.POST['BRL'].replace('$', '').replace(',', '.'))
         return HttpResponseRedirect(
@@ -71,6 +83,10 @@ def calc_exchange(request, base_currency, target_currency, value):
 
 
 class LatestRateView(generic.ListView):
+    """
+    The Latest Rate view.
+    Which you can retrieve a json-like information about a currency exchange.
+    """
     model = Rate
     template_name = 'exchange_rates/latest_rate.html'
     context_object_name = 'rate'
@@ -101,10 +117,17 @@ class LatestRateView(generic.ListView):
 
 
 def convert_tz(date_str):
+    """
+    Simple general static str to timezone method
+    """
     return timezone.make_aware(timezone.datetime.strptime(date_str, '%Y-%m-%d'))
 
 
 class HistoricalDataView(generic.ListView):
+    """
+    The Historical Data view.
+    Which you can see the historical information about a currency exchange.
+    """
     template_name = 'exchange_rates/historical_data.html'
     context_object_name = 'info'
 
@@ -153,6 +176,11 @@ class HistoricalDataView(generic.ListView):
 
 
 def set_history(request, base_currency, target_currency):
+    """
+    The Set History view.
+    That redirects you to the filtered history list.
+    This view is executed by the History Data view form.
+    """
     if request.method == 'POST':
         start = request.POST['start']
         end = request.POST['end']
@@ -174,6 +202,10 @@ def set_history(request, base_currency, target_currency):
 
 
 class HistoricalDataJSView(generic.ListView):
+    """
+    The Historical Data JS view.
+    Which you can retrieve a json-like information about a currency exchange history.
+    """
     model = Rate
     template_name = 'exchange_rates/historical_data_js.html'
     context_object_name = 'history'

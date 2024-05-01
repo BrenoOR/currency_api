@@ -93,9 +93,6 @@ WSGI_APPLICATION = "currency_api.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-#DB_ENDPOINT = 'http://localhost:8000'
-#DB_TABLE = 'rates'
-
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql_psycopg2",
